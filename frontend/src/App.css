@@ -1,0 +1,68 @@
+/* ScrollMenu iç kapsayıcısı için yatay sıralama ve kaydırma - Tailwind: flex flex-row overflow-x-auto whitespace-nowrap */
+.react-horizontal-scrolling-menu--scroll-container {
+  display: flex !important;
+  flex-direction: row !important;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+}
+/* ScrollMenu ana kapsayıcısı için yatay sıralama ve kaydırma - Tailwind: flex flex-row overflow-x-auto whitespace-nowrap */
+.react-horizontal-scrolling-menu-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+}
+/* scroll-menu-container > div - Tailwind: flex flex-row overflow-x-auto whitespace-nowrap */
+.scroll-menu-container > div {
+  display: flex !important;
+  flex-direction: row !important;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+}
+/* scroll-menu-top-container - Tailwind: bg-gray-500 w-full max-w-4xl */
+
+/* scroll-menu-title - Tailwind: text-2xl */
+
+/* scroll-menu-item - Tailwind: px-4 py-2 m-2 bg-gray-200 rounded-lg whitespace-nowrap h-64 w-44 inline-block */
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
