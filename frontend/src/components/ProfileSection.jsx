@@ -3,19 +3,22 @@ export default function ProfileSection() {
     <div className="flex flex-row h-[500px] mt-5">
       {" "}
       {/* profile-section-main-container */}
-      <div className="w-[300px] border border-gray-500 mr-4">
+      <div className="w-[300px] border border-gray-500 mr-4 p-4">
         {" "}
         {/* profile-section-container */}
         {/* image-container */}
-        <div className="">
+        <div className="flex justify-center items-center w-full mb-4">
           {/* profile-image */}
-          <img className="h-25 mt-5" src="/icons8-test-account-48.png"></img>
+          <img
+            className="w-16 h-16 rounded-full object-cover"
+            src="/icons8-test-account-48.png"
+          ></img>
         </div>
         {/* info-container */}
-        <div className="">
+        <div className="text-center">
           {/* p */}
-          <p className="text-lg">isim-soyisim</p>
-          <p className="text-lg">yaş</p>
+          <p className="text-lg font-semibold mb-2">isim-soyisim</p>
+          <p className="text-lg text-gray-600">yaş</p>
         </div>
       </div>
       <div className="w-[300px] border border-gray-500 mr-4">
