@@ -1,6 +1,7 @@
 import AnimatedList from "../components/AnimatedList";
 import { useNavigate } from "react-router-dom";
 import MedicineSection from "../components/MedicineSection";
+import { useState } from "react";
 
 const items = [
   "Item 1",
@@ -15,8 +16,16 @@ const items = [
   "Item 10",
 ];
 
-export function MedicinePage() {
+export function MedicinePage({ medicines, users }) {
   const navigate = useNavigate();
+  const [selectedMedicine, setSelectedMedicine] = useState(null);
+
+  // Medicine seçimi handler'ı
+  const handleMedicineSelect = (medicine, index) => {
+    console.log("Selected medicine:", medicine, "at index:", index);
+    setSelectedMedicine(medicine);
+  };
+
   return (
     <div className="grid">
       {" "}
@@ -36,14 +45,14 @@ export function MedicinePage() {
       <div className="flex flex-row">
         {" "}
         {/* mid-container */}
-        <MedicineSection />
+        <MedicineSection selectedMedicine={selectedMedicine} />
         <div className="mt-5">
           {" "}
           {/* list-section */}
           <input className="w-[350px] h-6 mb-2 "></input> {/* search-bar */}
           <AnimatedList
-            items={items}
-            onItemSelect={(item, index) => console.log(item, index)}
+            listItems={medicines}
+            onItemSelect={handleMedicineSelect}
             showGradients={true}
             enableArrowNavigation={true}
             displayScrollbar={true}

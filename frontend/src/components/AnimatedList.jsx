@@ -27,7 +27,16 @@ const AnimatedItem = ({
 };
 
 const AnimatedList = ({
-  items = [
+  listItems, // Genel prop - users, medicines, veya herhangi bir data array'i olabilir
+  onItemSelect,
+  showGradients = true,
+  enableArrowNavigation = true,
+  className = "",
+  itemClassName = "",
+  displayScrollbar = true,
+  initialSelectedIndex = -1,
+  fallbackItems = [
+    // Varsayılan items (listItems boşsa kullanılır)
     "Item 1",
     "Item 2",
     "Item 3",
@@ -38,25 +47,17 @@ const AnimatedList = ({
     "Item 8",
     "Item 9",
     "Item 10",
-    "Item 11",
-    "Item 12",
-    "Item 13",
-    "Item 14",
-    "Item 15",
   ],
-  onItemSelect,
-  showGradients = true,
-  enableArrowNavigation = true,
-  className = "",
-  itemClassName = "",
-  displayScrollbar = true,
-  initialSelectedIndex = -1,
 }) => {
   const listRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(initialSelectedIndex);
   const [keyboardNav, setKeyboardNav] = useState(false);
   const [topGradientOpacity, setTopGradientOpacity] = useState(0);
   const [bottomGradientOpacity, setBottomGradientOpacity] = useState(1);
+
+  // listItems varsa onu kullan, yoksa fallbackItems'ı kullan
+  const listData =
+    listItems && listItems.length > 0 ? listItems : fallbackItems;
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -73,16 +74,16 @@ const AnimatedList = ({
       if (e.key === "ArrowDown" || (e.key === "Tab" && !e.shiftKey)) {
         e.preventDefault();
         setKeyboardNav(true);
-        setSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));
+        setSelectedIndex((prev) => Math.min(prev + 1, listData.length - 1));
       } else if (e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey)) {
         e.preventDefault();
         setKeyboardNav(true);
         setSelectedIndex((prev) => Math.max(prev - 1, 0));
       } else if (e.key === "Enter") {
-        if (selectedIndex >= 0 && selectedIndex < items.length) {
+        if (selectedIndex >= 0 && selectedIndex < listData.length) {
           e.preventDefault();
           if (onItemSelect) {
-            onItemSelect(items[selectedIndex], selectedIndex);
+            onItemSelect(listData[selectedIndex], selectedIndex);
           }
         }
       }
@@ -90,7 +91,7 @@ const AnimatedList = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [items, selectedIndex, onItemSelect, enableArrowNavigation]);
+  }, [listData, selectedIndex, onItemSelect, enableArrowNavigation]);
 
   useEffect(() => {
     if (!keyboardNav || selectedIndex < 0 || !listRef.current) return;
@@ -132,9 +133,9 @@ const AnimatedList = ({
         }`}
         onScroll={handleScroll}
       >
-        {items.map((item, index) => (
+        {listData.map((item, index) => (
           <AnimatedItem
-            key={index}
+            key={typeof item === "object" ? item.id : index}
             delay={0.1}
             index={index}
             onMouseEnter={() => setSelectedIndex(index)}
@@ -152,7 +153,22 @@ const AnimatedList = ({
               } ${itemClassName}`}
             >
               {/* item-text */}
-              <p className="text-white m-0">{item}</p>
+              <div>
+                <p className="text-white m-0">
+                  {typeof item === "object"
+                    ? item.name || item.dosage || item.title || "Unknown Item"
+                    : item}
+                </p>
+                {typeof item === "object" && (
+                  <div className="text-gray-400 text-sm m-0 mt-1">
+                    {item.id && <span>ID: {item.id}</span>}
+                    {item.dosage && item.name && (
+                      <span> • Doz: {item.dosage}</span>
+                    )}
+                    {item.description && <span> • {item.description}</span>}
+                  </div>
+                )}
+              </div>
             </div>
           </AnimatedItem>
         ))}

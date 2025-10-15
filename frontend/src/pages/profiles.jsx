@@ -17,8 +17,15 @@ const items = [
   "Item 10",
 ];
 
-export function Profiles() {
+export function Profiles({ users, medicines }) {
   const navigate = useNavigate();
+  const [selectUser, setSelectedUser] = useState(null);
+
+  // user seçimi handler'ı
+  const handleUserSelect = (user, index) => {
+    console.log("Selected medicine:", user, "at index:", index);
+    setSelectedUser(user);
+  };
   return (
     <div className="grid">
       {" "}
@@ -41,15 +48,15 @@ export function Profiles() {
         <div className="">
           {" "}
           {/* profile-section */}
-          <ProfileSection />
+          <ProfileSection selectedUser={selectUser} medicines={medicines} />
         </div>
         <div className="mt-5">
           {" "}
           {/* list-section */}
           <input className="w-[350px] h-6 mb-2"></input> {/* search-bar */}
           <AnimatedList
-            items={items}
-            onItemSelect={(item, index) => console.log(item, index)}
+            listItems={users}
+            onItemSelect={handleUserSelect}
             showGradients={true}
             enableArrowNavigation={true}
             displayScrollbar={true}

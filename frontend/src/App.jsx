@@ -66,8 +66,14 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/profiles" element={<Profiles />} />
-        <Route path="/medicine" element={<MedicinePage />} />
+        <Route
+          path="/profiles"
+          element={<Profiles users={users} medicines={medicines} />}
+        />
+        <Route
+          path="/medicine"
+          element={<MedicinePage medicines={medicines} users={users} />}
+        />
         <Route path="/calendar" element={<CalendarPage />} />
       </Routes>
     </Router>

@@ -1,4 +1,4 @@
-export default function ProfileSection() {
+export default function ProfileSection({ selectedUser, medicines = [] }) {
   return (
     <div className="flex flex-row h-[500px] mt-5">
       {" "}
@@ -17,19 +17,23 @@ export default function ProfileSection() {
         {/* info-container */}
         <div className="text-center">
           {/* p */}
-          <p className="text-lg font-semibold mb-2">isim-soyisim</p>
-          <p className="text-lg text-gray-600">yaş</p>
+          <p className="text-lg font-semibold mb-2">
+            {selectedUser ? selectedUser.name : "Kullanıcı seçiniz"}
+          </p>
+          <p className="text-lg text-gray-600">
+            {selectedUser ? `ID: ${selectedUser.id}` : "Kullanıcı bilgisi yok"}
+          </p>
         </div>
       </div>
-      <div className="w-[300px] border border-gray-500 mr-4">
+      <div className="w-[300px] border border-gray-500 mr-4 p-4">
         {" "}
         {/* medicine-main-container */}
-        <p className="text-lg">Kullandığı ilaçlar</p> {/* p */}
+        <p className="text-lg font-semibold mb-4">Kullandığı ilaçlar</p>{" "}
+        {/* p */}
         <div>
-          <p className="text-lg">ilaç örnek 1</p> {/* p */}
-          <p className="text-lg">ilaç örnek 2</p> {/* p */}
-          <p className="text-lg">ilaç örnek 3</p> {/* p */}
-          <button>düzenle</button>
+          <button className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+            düzenle
+          </button>
         </div>
       </div>
     </div>
