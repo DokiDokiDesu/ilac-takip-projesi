@@ -3,29 +3,64 @@ import { motion, useInView } from "motion/react";
 import AnimatedList from "../components/AnimatedList";
 import ProfileSection from "../components/ProfileSection";
 import { useNavigate } from "react-router-dom";
+import { AddProfileModal } from "../components/AddProfileModal";
 
-const items = [
-  "Item 1",
-  "Item 2",
-  "Item 3",
-  "Item 4",
-  "Item 5",
-  "Item 6",
-  "Item 7",
-  "Item 8",
-  "Item 9",
-  "Item 10",
-];
-
-export function Profiles({ users, medicines }) {
+export function Profiles({ users, medicines, onAddUser, onDeleteUser }) {
   const navigate = useNavigate();
-  const [selectUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   // user seçimi handler'ı
   const handleUserSelect = (user, index) => {
-    console.log("Selected medicine:", user, "at index:", index);
+    console.log("Selected user:", user, "at index:", index);
     setSelectedUser(user);
   };
+
+  // Yeni kullanıcı ekleme handler'ı
+  const handleUserAdded = async (userData) => {
+    try {
+      const newUser = await onAddUser(userData);
+      console.log("Yeni kullanıcı eklendi:", newUser);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Kullanıcı ekleme hatası:", error);
+      alert("Kullanıcı eklenirken bir hata oluştu!");
+    }
+  };
+
+  // Kullanıcı silme handler'ı
+  const handleUserDelete = async (userId) => {
+    console.log("handleUserDelete çağrıldı, userId:", userId);
+
+    if (!userId) {
+      alert("Lütfen silmek istediğiniz kullanıcıyı seçin!");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      "Bu kullanıcıyı silmek istediğinizden emin misiniz?"
+    );
+
+    console.log("Kullanıcı onayı:", confirmDelete);
+
+    if (!confirmDelete) return;
+
+    try {
+      console.log("onDeleteUser çağrılıyor...");
+      await onDeleteUser(userId);
+      console.log("Kullanıcı silindi:", userId);
+
+      // Eğer silinen kullanıcı seçili ise seçimi temizle
+      if (selectedUser && selectedUser.id === userId) {
+        setSelectedUser(null);
+        console.log("Seçilen kullanıcı temizlendi");
+      }
+    } catch (error) {
+      console.error("Kullanıcı silme hatası:", error);
+      alert("Kullanıcı silinirken bir hata oluştu!");
+    }
+  };
+
   return (
     <div className="grid">
       {" "}
@@ -48,7 +83,11 @@ export function Profiles({ users, medicines }) {
         <div className="">
           {" "}
           {/* profile-section */}
-          <ProfileSection selectedUser={selectUser} medicines={medicines} />
+          <ProfileSection
+            selectedUser={selectedUser}
+            medicines={medicines}
+            onDeleteUser={handleUserDelete}
+          />
         </div>
         <div className="mt-5">
           {" "}
@@ -61,9 +100,19 @@ export function Profiles({ users, medicines }) {
             enableArrowNavigation={true}
             displayScrollbar={true}
           />
-          <button className="mt-2">yeni profil ekle</button> {/* add-profile */}
+          <button className="mt-2" onClick={() => setShowModal(true)}>
+            yeni profil ekle
+          </button>{" "}
+          {/* add-profile */}
         </div>
       </div>
+      {/* Modal */}
+      {showModal && (
+        <AddProfileModal
+          onClose={() => setShowModal(false)}
+          onUserAdded={handleUserAdded}
+        />
+      )}
     </div>
   );
 }

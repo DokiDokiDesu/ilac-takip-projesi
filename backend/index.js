@@ -63,6 +63,52 @@ app.get("/medicines", (req, res) => {
   });
 });
 
+// 🔹 İlaç sil
+app.delete("/medicines/:id", (req, res) => {
+  const { id } = req.params;
+  console.log(`DELETE /medicines/${id} isteği alındı`);
+
+  db.run("DELETE FROM medicines WHERE id = ?", [id], function (err) {
+    if (err) {
+      console.error("Database hatası:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+
+    console.log(`Silinen kayıt sayısı: ${this.changes}`);
+
+    if (this.changes === 0) {
+      console.log("İlaç bulunamadı");
+      return res.status(404).json({ error: "İlaç bulunamadı" });
+    }
+
+    console.log("İlaç başarıyla silindi");
+    res.json({ message: "İlaç başarıyla silindi", deletedId: id });
+  });
+});
+
+// 🔹 Kullanıcı sil
+app.delete("/users/:id", (req, res) => {
+  const { id } = req.params;
+  console.log(`DELETE /users/${id} isteği alındı`);
+
+  db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
+    if (err) {
+      console.error("Database hatası:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+
+    console.log(`Silinen kayıt sayısı: ${this.changes}`);
+
+    if (this.changes === 0) {
+      console.log("Kullanıcı bulunamadı");
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    console.log("Kullanıcı başarıyla silindi");
+    res.json({ message: "Kullanıcı başarıyla silindi", deletedId: id });
+  });
+});
+
 // Server başlat
 app.listen(port, () => {
   console.log(`✅ Backend çalışıyor: http://localhost:${port}`);

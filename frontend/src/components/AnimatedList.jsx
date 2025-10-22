@@ -35,19 +35,7 @@ const AnimatedList = ({
   itemClassName = "",
   displayScrollbar = true,
   initialSelectedIndex = -1,
-  fallbackItems = [
-    // Varsayılan items (listItems boşsa kullanılır)
-    "Item 1",
-    "Item 2",
-    "Item 3",
-    "Item 4",
-    "Item 5",
-    "Item 6",
-    "Item 7",
-    "Item 8",
-    "Item 9",
-    "Item 10",
-  ],
+  fallbackItems = ["liste boş"],
 }) => {
   const listRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(initialSelectedIndex);
@@ -122,14 +110,14 @@ const AnimatedList = ({
 
   return (
     /* scroll-list-container */
-    <div className={`relative w-[350px] ${className}`}>
+    <div className={`relative w-[350px] rounded-lg ${className}`}>
       {/* scroll-list */}
       <div
         ref={listRef}
-        className={`max-h-[400px] overflow-y-auto p-4 ${
+        className={`rounded-lg max-h-[400px] overflow-y-auto p-4 ${
           !displayScrollbar
             ? "[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" /* no-scrollbar */
-            : "[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#060010] [&::-webkit-scrollbar-thumb]:bg-[#271e37] [&::-webkit-scrollbar-thumb]:rounded"
+            : "[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#060010] [&::-webkit-scrollbar-thumb]:bg-[#2a292c] [&::-webkit-scrollbar-thumb]:rounded"
         }`}
         onScroll={handleScroll}
       >

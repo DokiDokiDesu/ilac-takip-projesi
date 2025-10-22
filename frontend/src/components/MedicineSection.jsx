@@ -1,6 +1,23 @@
-export default function MedicineSection({ selectedMedicine }) {
+export default function MedicineSection({
+  selectedMedicine,
+  onDeleteMedicine,
+}) {
+  const handleDelete = async () => {
+    if (!selectedMedicine || !selectedMedicine.id) {
+      console.error("No medicine selected or invalid ID");
+      return;
+    }
+
+    try {
+      await onDeleteMedicine(selectedMedicine.id);
+    } catch (error) {
+      console.error("Error deleting medicine:", error);
+      alert("İlaç silinirken bir hata oluştu!");
+    }
+  };
+
   return (
-    <div className="flex flex-col  bg-[rgb(229,231,235)] h-[390px] mt-[60px] w-[450px] mr-10 ">
+    <div className="rounded-lg flex flex-col  bg-[rgb(229,231,235)] h-[390px] mt-[60px] w-[450px] mr-10 ">
       {" "}
       {/* medicine-section-container */}
       <div className="flex flex-col items-center justify-center p-4">
@@ -33,12 +50,9 @@ export default function MedicineSection({ selectedMedicine }) {
         </div>
         <p className="text-black mt-4">kullanıcıları gör</p>
         <button
-          className="text-white mt-4 h-[40px] w-[70px] rounded px-4 py-2 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 hover:opacity-90"
-          style={{
-            backgroundColor: "#dc2626",
-          }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#b91c1c")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "#dc2626")}
+          className="rounded-lg border-2 border-red-500 text-white mt-4 h-[40px] w-[70px] px-4 py-2 font-medium transition-colors duration-200 focus:outline-none focus:ring focus:ring-offset-2 hover:opacity-90 bg-red-600 hover:bg-white hover:text-red-600 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleDelete}
+          disabled={!selectedMedicine}
         >
           Sil
         </button>
