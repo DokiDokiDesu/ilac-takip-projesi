@@ -4,16 +4,27 @@ import AnimatedList from "../components/AnimatedList";
 import ProfileSection from "../components/ProfileSection";
 import { useNavigate } from "react-router-dom";
 import { AddProfileModal } from "../components/AddProfileModal";
+import { AddMedicineUserModal } from "../components/AddMedicineUserModal";
 
-export function Profiles({ users, medicines, onAddUser, onDeleteUser }) {
+export function Profiles({
+  users,
+  medicines,
+  medicineUsers,
+  onAddUser,
+  onDeleteUser,
+  onAddMedicineUser,
+  onDeleteMedicineUser,
+  selectedUser,
+  onSelectUser,
+}) {
   const navigate = useNavigate();
-  const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [userMedicines, setUserMedicines] = useState([]);
 
   // user seçimi handler'ı
   const handleUserSelect = (user, index) => {
     console.log("Selected user:", user, "at index:", index);
-    setSelectedUser(user);
+    onSelectUser(user);
   };
 
   // Yeni kullanıcı ekleme handler'ı
@@ -52,7 +63,7 @@ export function Profiles({ users, medicines, onAddUser, onDeleteUser }) {
 
       // Eğer silinen kullanıcı seçili ise seçimi temizle
       if (selectedUser && selectedUser.id === userId) {
-        setSelectedUser(null);
+        onSelectUser(null);
         console.log("Seçilen kullanıcı temizlendi");
       }
     } catch (error) {
@@ -86,7 +97,14 @@ export function Profiles({ users, medicines, onAddUser, onDeleteUser }) {
           <ProfileSection
             selectedUser={selectedUser}
             medicines={medicines}
+            userMedicines={
+              selectedUser
+                ? medicineUsers.filter((mu) => mu.user_id === selectedUser.id)
+                : []
+            }
             onDeleteUser={handleUserDelete}
+            onAddMedicineUser={onAddMedicineUser}
+            onDeleteMedicineUser={onDeleteMedicineUser}
           />
         </div>
         <div className="mt-5">

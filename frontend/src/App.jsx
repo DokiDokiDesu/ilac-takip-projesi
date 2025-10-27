@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
@@ -7,13 +7,13 @@ import { Homepage } from "./pages/homepage";
 import { Profiles } from "./pages/profiles";
 import { MedicinePage } from "./pages/medicine";
 import { CalendarPage } from "./pages/CalendarPage";
-import { useEffect } from "react";
 import axios from "axios";
 
 function App() {
   //backend test
   const [users, setUsers] = useState([]);
   const [medicines, setMedicines] = useState([]);
+  const [medicineUsers, setMedicineUsers] = useState([]);
 
   // Kullanıcıları getir - async/await
   const fetchUsers = async () => {
@@ -32,6 +32,48 @@ function App() {
       console.error("Users API error:", error);
     }
   };
+  //kullanıcı-ilaç ilişkisini getir
+  const fetchMedicineUsers = useCallback(
+    async (userId = null) => {
+      try {
+        // Eğer userId null ise veya kullanıcı listesinde yoksa, boş liste dön
+        if (userId === null || !users.some((user) => user.id === userId)) {
+          console.log(
+            "No user selected or user not found, returning empty list"
+          );
+          setMedicineUsers([]);
+          return;
+        }
+
+        const url = `http://localhost:5000/api/user-medicines/${userId}`;
+        console.log("Fetching medicines for user:", userId);
+
+        const response = await axios.get(url);
+        console.log("Medicine-user relations received:", response.data);
+
+        // Her bir ilişki için medicine_name ve medicine_dosage alanlarını kontrol et
+        const formattedData = response.data.map((relation) => ({
+          ...relation,
+          medicine_name: relation.medicine_name || "İsimsiz İlaç",
+          medicine_dosage: relation.medicine_dosage || "Doz bilgisi yok",
+        }));
+
+        console.log("Formatted medicine-user relations:", formattedData);
+        setMedicineUsers(formattedData);
+      } catch (error) {
+        if (error.response?.status === 404) {
+          console.log(
+            "User not found or has no medicines, returning empty list"
+          );
+          setMedicineUsers([]);
+        } else {
+          console.error("Fetch medicine-user relations error:", error);
+          setMedicineUsers([]);
+        }
+      }
+    },
+    [users]
+  );
 
   // İlaçları getir - async/await
   const fetchMedicines = async () => {
@@ -71,6 +113,32 @@ function App() {
       return newUser;
     } catch (error) {
       console.error("Add user error:", error);
+      throw error;
+    }
+  };
+
+  // Yeni kullanıcı-ilaç ilişkisi ekleme fonksiyonu
+  const addMedicineUser = async (relationData) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/user-medicines",
+        relationData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("Added medicine-user relation:", response.data);
+
+      // State'i güncelle
+      setMedicineUsers((prevRelations) => [...prevRelations, response.data]);
+
+      // İlişkileri yeniden çek
+      await fetchMedicineUsers(relationData.user_id);
+
+      return response.data;
+    } catch (error) {
+      console.error("Add medicine-user error:", error);
       throw error;
     }
   };
@@ -142,6 +210,47 @@ function App() {
     }
   };
 
+  //kullanıcı-ilaç ilişkisini silme methodu
+
+  const deleteMedicineUser = useCallback(
+    async (userId, medicineId) => {
+      if (!userId || !medicineId) {
+        console.error("userId or medicineId undefined!");
+        return;
+      }
+
+      try {
+        console.log(
+          `Deleting medicine-user relation: userId=${userId}, medicineId=${medicineId}`
+        );
+
+        const response = await axios.delete(
+          `http://localhost:5000/api/user-medicines/${userId}/${medicineId}`
+        );
+
+        console.log(
+          "DELETE medicine-user response status:",
+          response.status,
+          "data:",
+          response.data
+        );
+
+        // İlişkileri yeniden çek
+        await fetchMedicineUsers(userId);
+
+        return response.data;
+      } catch (error) {
+        console.error("Delete medicine-user error:", error);
+        if (error.response?.status === 404) {
+          // İlişki zaten silinmiş olabilir, listeyi yine de güncelle
+          await fetchMedicineUsers(userId);
+        }
+        throw error;
+      }
+    },
+    [fetchMedicineUsers]
+  );
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -149,6 +258,12 @@ function App() {
   useEffect(() => {
     fetchMedicines();
   }, []);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    fetchMedicineUsers(selectedUser?.id);
+  }, [selectedUser, fetchMedicineUsers, users]);
 
   console.log("Current users state:", users);
   // Yeni ilaç ekleme fonksiyonu
@@ -187,8 +302,13 @@ function App() {
             <Profiles
               users={users}
               medicines={medicines}
+              medicineUsers={medicineUsers}
               onAddUser={addUser}
               onDeleteUser={deleteUser}
+              onAddMedicineUser={addMedicineUser}
+              onDeleteMedicineUser={deleteMedicineUser}
+              selectedUser={selectedUser}
+              onSelectUser={setSelectedUser}
             />
           }
         />
@@ -198,7 +318,9 @@ function App() {
             <MedicinePage
               medicines={medicines}
               users={users}
+              medicineUsers={medicineUsers}
               onAddMedicine={addMedicine}
+              onAddMedicineUser={addMedicineUser}
               onDeleteMedicine={deleteMedicine}
             />
           }
