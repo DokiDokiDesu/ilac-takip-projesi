@@ -20,6 +20,7 @@ export function Profiles({
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [userMedicines, setUserMedicines] = useState([]);
+  const [isVisible, setIsVisible] = useState(true);
 
   // user seçimi handler'ı
   const handleUserSelect = (user, index) => {
@@ -105,29 +106,36 @@ export function Profiles({
             onDeleteUser={handleUserDelete}
             onAddMedicineUser={onAddMedicineUser}
             onDeleteMedicineUser={onDeleteMedicineUser}
+            setIsVisible={setIsVisible}
           />
         </div>
         <div className="mt-5">
           {" "}
           {/* list-section */}
           <input className="w-[350px] h-6 mb-2"></input> {/* search-bar */}
-          <AnimatedList
-            listItems={users}
-            onItemSelect={handleUserSelect}
-            showGradients={true}
-            enableArrowNavigation={true}
-            displayScrollbar={true}
-          />
-          <button className="mt-2" onClick={() => setShowModal(true)}>
-            yeni profil ekle
-          </button>{" "}
+          <div className={isVisible ? "" : "hidden"}>
+            <AnimatedList
+              listItems={users}
+              onItemSelect={handleUserSelect}
+              showGradients={true}
+              enableArrowNavigation={true}
+              displayScrollbar={true}
+            />
+          </div>
+          <div className="flex justify-center">
+            <button className="mt-2" onClick={() => setShowModal(true)}>
+              yeni profil ekle
+            </button>
+          </div>{" "}
           {/* add-profile */}
         </div>
       </div>
       {/* Modal */}
       {showModal && (
         <AddProfileModal
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+          }}
           onUserAdded={handleUserAdded}
         />
       )}

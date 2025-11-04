@@ -48,14 +48,18 @@ export default function MedicineSection({
             {selectedMedicine ? `#${selectedMedicine.id}` : "ID mevcut değil"}
           </p>
         </div>
-        <p className="text-black mt-4">kullanıcıları gör</p>
-        <button
-          className="rounded-lg border-2 border-red-500 text-white mt-4 h-[40px] w-[70px] px-4 py-2 font-medium transition-colors duration-200 focus:outline-none focus:ring focus:ring-offset-2 hover:opacity-90 bg-red-600 hover:bg-white hover:text-red-600 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={handleDelete}
-          disabled={!selectedMedicine}
-        >
-          Sil
-        </button>
+        <div className="">
+          <button
+            className="rounded-lg border-2 border-red-500 text-white mt-4 h-[40px] w-[70px] px-4 py-2 font-medium transition-colors duration-200 focus:outline-none focus:ring focus:ring-offset-2 hover:opacity-90 bg-red-600 hover:bg-white hover:text-red-600 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleDelete}
+            disabled={!selectedMedicine}
+          >
+            Sil
+          </button>
+          <button className="h-[40px]  ml-2 mb-2 border-solid border-2">
+            kullanıcıları gör
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -32,7 +32,9 @@ export function AddProfileModal({ onClose, onUserAdded }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-        <h2 className="text-lg font-semibold mb-4">Yeni Profil Ekle</h2>
+        <h2 className="text-lg font-semibold mb-4 text-black">
+          Yeni Profil Ekle
+        </h2>
 
         <input
           type="text"
@@ -47,7 +49,11 @@ export function AddProfileModal({ onClose, onUserAdded }) {
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+            className="px-3 py-2 border-solid-1 border-red-600 bg-red-600
+            hover:bg-white 
+              hover:text-red-600
+              hover:border-red-600
+            rounded disabled:opacity-50"
           >
             İptal
           </button>

@@ -89,7 +89,8 @@ export function AddMedicineUserModal({
               name="medicine_id"
               value={formData.medicine_id}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500
+              text-black"
             >
               <option value="">İlaç seçiniz</option>
               {medicines.map((medicine) => (
@@ -110,7 +111,8 @@ export function AddMedicineUserModal({
               name="start_date"
               value={formData.start_date}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500
+              text-black"
             />
           </div>
 
@@ -124,7 +126,8 @@ export function AddMedicineUserModal({
               name="end_date"
               value={formData.end_date}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500
+              text-black"
             />
           </div>
 
@@ -139,7 +142,8 @@ export function AddMedicineUserModal({
               value={formData.daily_dosage}
               onChange={handleChange}
               min="1"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500
+              text-black"
             />
           </div>
 

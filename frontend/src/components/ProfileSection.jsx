@@ -9,6 +9,7 @@ export default function ProfileSection({
   onAddMedicineUser,
   onDeleteMedicineUser,
   onFetchMedicineUsers,
+  setIsVisible,
 }) {
   const [showAddMedicineModal, setShowAddMedicineModal] = useState(false);
 
@@ -26,11 +27,6 @@ export default function ProfileSection({
           <div className="text-center flex-grow">
             <p className="text-lg font-semibold mb-2">
               {selectedUser ? selectedUser.name : "Kullanıcı seçiniz"}
-            </p>
-            <p className="text-lg text-gray-600">
-              {selectedUser
-                ? `ID: ${selectedUser.id}`
-                : "Kullanıcı bilgisi yok"}
             </p>
           </div>
           <div className="mt-auto">
@@ -107,16 +103,13 @@ export default function ProfileSection({
           <div className="mt-auto space-x-5">
             <button
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => setShowAddMedicineModal(true)}
+              onClick={() => {
+                setShowAddMedicineModal(true);
+                setIsVisible(false);
+              }}
               disabled={!selectedUser}
             >
               ekle
-            </button>
-            <button
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={!selectedUser}
-            >
-              sil
             </button>
           </div>
         </div>
@@ -124,7 +117,10 @@ export default function ProfileSection({
 
       {showAddMedicineModal && (
         <AddMedicineUserModal
-          onClose={() => setShowAddMedicineModal(false)}
+          onClose={() => {
+            setShowAddMedicineModal(false);
+            setIsVisible(true);
+          }}
           onMedicineUserAdded={async (data) => {
             try {
               await onAddMedicineUser(data);
