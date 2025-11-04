@@ -33,47 +33,49 @@ function App() {
     }
   };
   //kullanıcı-ilaç ilişkisini getir
-  const fetchMedicineUsers = useCallback(
-    async (userId = null) => {
-      try {
-        // Eğer userId null ise veya kullanıcı listesinde yoksa, boş liste dön
-        if (userId === null || !users.some((user) => user.id === userId)) {
-          console.log(
-            "No user selected or user not found, returning empty list"
-          );
-          setMedicineUsers([]);
-          return;
-        }
+  const fetchMedicineUsers = useCallback(async (userId = null) => {
+    try {
+      const url = userId
+        ? `http://localhost:5000/api/user-medicines/${userId}`
+        : "http://localhost:5000/api/user-medicines";
 
-        const url = `http://localhost:5000/api/user-medicines/${userId}`;
-        console.log("Fetching medicines for user:", userId);
+      console.log("Fetching medicines for user:", userId);
 
-        const response = await axios.get(url);
-        console.log("Medicine-user relations received:", response.data);
+      const response = await axios.get(url);
+      console.log("Medicine-user relations received:", response.data);
 
-        // Her bir ilişki için medicine_name ve medicine_dosage alanlarını kontrol et
-        const formattedData = response.data.map((relation) => ({
+      // Her bir ilişki için medicine_name ve medicine_dosage alanlarını kontrol et
+      // Her kayıt için daha detaylı bilgi logla
+      const formattedData = response.data.map((relation) => {
+        console.log("İşlenen kayıt:", {
+          id: relation.id,
+          user_id: relation.user_id,
+          medicine_id: relation.medicine_id,
+          start_date: relation.start_date,
+          end_date: relation.end_date,
+          daily_dosage: relation.daily_dosage,
+          medicine_dosage: relation.medicine_dosage,
+        });
+
+        return {
           ...relation,
           medicine_name: relation.medicine_name || "İsimsiz İlaç",
           medicine_dosage: relation.medicine_dosage || "Doz bilgisi yok",
-        }));
+        };
+      });
 
-        console.log("Formatted medicine-user relations:", formattedData);
-        setMedicineUsers(formattedData);
-      } catch (error) {
-        if (error.response?.status === 404) {
-          console.log(
-            "User not found or has no medicines, returning empty list"
-          );
-          setMedicineUsers([]);
-        } else {
-          console.error("Fetch medicine-user relations error:", error);
-          setMedicineUsers([]);
-        }
+      console.log("Formatted medicine-user relations:", formattedData);
+      setMedicineUsers(formattedData);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        console.log("User not found or has no medicines, returning empty list");
+        setMedicineUsers([]);
+      } else {
+        console.error("Fetch medicine-user relations error:", error);
+        setMedicineUsers([]);
       }
-    },
-    [users]
-  );
+    }
+  }, []);
 
   // İlaçları getir - async/await
   const fetchMedicines = async () => {
@@ -262,8 +264,16 @@ function App() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-    fetchMedicineUsers(selectedUser?.id);
-  }, [selectedUser, fetchMedicineUsers, users]);
+    if (selectedUser?.id) {
+      // Seçili kullanıcının ilaçlarını getir
+      fetchMedicineUsers(selectedUser.id);
+    }
+  }, [selectedUser, fetchMedicineUsers]);
+
+  // Sayfa yüklendiğinde tüm kullanıcıların ilaçlarını getir
+  useEffect(() => {
+    fetchMedicineUsers();
+  }, [fetchMedicineUsers]);
 
   console.log("Current users state:", users);
   // Yeni ilaç ekleme fonksiyonu
@@ -295,7 +305,16 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Homepage />} />
+        <Route
+          path="/"
+          element={
+            <Homepage
+              medicineUsers={medicineUsers}
+              users={users}
+              medicines={medicines}
+            />
+          }
+        />
         <Route
           path="/profiles"
           element={

@@ -33,6 +33,14 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (medicine_id) REFERENCES medicines(id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS medicine_taken_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    medicine_user_id INTEGER NOT NULL,
+    taken_date TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (medicine_user_id) REFERENCES medicine_user(id)
+  )`);
 });
 
 // 🔹 Kullanıcı ekle
@@ -254,6 +262,149 @@ app.delete("/api/user-medicines/:userId/:medicineId", (req, res) => {
 
       console.log("Kayıt başarıyla silindi");
       res.json({ message: "Kayıt başarıyla silindi", userId, medicineId });
+    }
+  );
+});
+
+// İlaç alındı işaretle
+app.post("/api/medicine-taken", (req, res) => {
+  const { medicine_user_id } = req.body;
+  const taken_date = new Date().toISOString().split("T")[0];
+
+  // Önce bu ilacın bugün alınıp alınmadığını kontrol et
+  db.get(
+    "SELECT id FROM medicine_taken_logs WHERE medicine_user_id = ? AND taken_date = ?",
+    [medicine_user_id, taken_date],
+    (err, row) => {
+      if (err) {
+        console.error("Kontrol hatası:", err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      // Eğer zaten alınmışsa hata dön
+      if (row) {
+        return res
+          .status(400)
+          .json({ error: "Bu ilaç bugün zaten alınmış olarak işaretlenmiş" });
+      }
+
+      // Yeni kayıt ekle
+      db.run(
+        "INSERT INTO medicine_taken_logs (medicine_user_id, taken_date) VALUES (?, ?)",
+        [medicine_user_id, taken_date],
+        function (err) {
+          if (err) {
+            console.error("Kayıt hatası:", err);
+            return res.status(500).json({ error: err.message });
+          }
+          res.json({ success: true, id: this.lastID });
+        }
+      );
+    }
+  );
+});
+
+// Bugün alınan ilaçları getir
+app.get("/api/medicine-taken/:date", (req, res) => {
+  const date = req.params.date;
+
+  db.all(
+    "SELECT medicine_user_id FROM medicine_taken_logs WHERE taken_date = ?",
+    [date],
+    (err, rows) => {
+      if (err) {
+        console.error("Veri getirme hatası:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(rows.map((row) => row.medicine_user_id));
+    }
+  );
+});
+
+// İlaç alındı olarak işaretle
+app.post("/api/medicine-taken", (req, res) => {
+  console.log("POST isteği alındı /api/medicine-taken:", req.body);
+
+  const { medicine_user_id } = req.body;
+  if (!medicine_user_id) {
+    console.error("medicine_user_id eksik");
+    return res.status(400).json({ error: "medicine_user_id gerekli" });
+  }
+
+  const taken_date = new Date().toISOString().split("T")[0];
+  console.log("İşleniyor:", { medicine_user_id, taken_date });
+
+  // Önce ilişkinin var olup olmadığını kontrol et
+  db.get(
+    "SELECT id FROM medicine_user WHERE id = ?",
+    [medicine_user_id],
+    (err, medicineUser) => {
+      if (err) {
+        console.error("İlişki kontrol hatası:", err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      if (!medicineUser) {
+        console.error("İlişki bulunamadı:", medicine_user_id);
+        return res
+          .status(404)
+          .json({ error: "İlaç-kullanıcı ilişkisi bulunamadı" });
+      }
+
+      // İlacın bugün alınıp alınmadığını kontrol et
+      db.get(
+        "SELECT id FROM medicine_taken_logs WHERE medicine_user_id = ? AND taken_date = ?",
+        [medicine_user_id, taken_date],
+        (err, row) => {
+          if (err) {
+            console.error("Kontrol hatası:", err);
+            return res.status(500).json({ error: err.message });
+          }
+
+          if (row) {
+            console.log("İlaç zaten alınmış:", {
+              medicine_user_id,
+              taken_date,
+            });
+            return res.status(400).json({
+              error: "Bu ilaç bugün zaten alınmış olarak işaretlenmiş",
+            });
+          }
+
+          // Yeni kayıt ekle
+          db.run(
+            "INSERT INTO medicine_taken_logs (medicine_user_id, taken_date) VALUES (?, ?)",
+            [medicine_user_id, taken_date],
+            function (err) {
+              if (err) {
+                console.error("Kayıt hatası:", err);
+                return res.status(500).json({ error: err.message });
+              }
+              console.log("Kayıt başarılı:", { id: this.lastID });
+              res.json({ success: true, id: this.lastID });
+            }
+          );
+        }
+      );
+    }
+  );
+});
+
+// Bugün alınan ilaçları getir
+app.get("/api/medicine-taken/:date", (req, res) => {
+  const date = req.params.date;
+  console.log("Alınan ilaçlar istendi:", date);
+
+  db.all(
+    "SELECT medicine_user_id FROM medicine_taken_logs WHERE taken_date = ?",
+    [date],
+    (err, rows) => {
+      if (err) {
+        console.error("Veri getirme hatası:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      console.log("Bulunan kayıtlar:", rows);
+      res.json(rows.map((row) => row.medicine_user_id));
     }
   );
 });
