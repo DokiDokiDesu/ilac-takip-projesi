@@ -9,6 +9,7 @@ export function MedicinePage({
   users,
   onAddMedicine,
   onDeleteMedicine,
+  medicineUsers,
 }) {
   const navigate = useNavigate();
   const [selectedMedicine, setSelectedMedicine] = useState(null);
@@ -54,6 +55,8 @@ export function MedicinePage({
         <MedicineSection
           selectedMedicine={selectedMedicine}
           onDeleteMedicine={onDeleteMedicine}
+          medicineUsers={medicineUsers}
+          users={users}
         />
         <div className="mt-5">
           {" "}
